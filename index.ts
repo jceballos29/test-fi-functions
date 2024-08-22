@@ -1,84 +1,50 @@
-console.log('Test Functions');
+import { discrepancies } from './discrepancies';
+console.log('discrepancies between idcs and rnts');
+console.log('-------------------');
 
-const contracts: any[] = [
+interface Period {
+	startDate: string;
+	endDate: string;
+}
+
+const contracts: Period[] = [
 	{
-		resourceId: 'cd47a3be-b254-42a3-918c-0878bc69ac34',
-		number: 1,
-		contractTypeId: 189,
-		contractType: null,
-		startDate: '2024-01-01T00:00:00',
+		startDate: '2024-02-01T00:00:00',
 		endDate: '2024-05-31T00:00:00',
-		workingDayType: 0,
-		workHours: 0,
-		partialJourneyPercent: 0,
 	},
 	{
-		resourceId: 'cd47a3be-b254-42a3-918c-0878bc69ac34',
-		number: 2,
-		contractTypeId: 189,
-		contractType: null,
 		startDate: '2024-07-01T00:00:00',
 		endDate: '2024-08-31T00:00:00',
-		workingDayType: 0,
-		workHours: 0,
-		partialJourneyPercent: 0,
 	},
 ];
 
-const periods: any[] = [
+const periods: Period[] = [
 	{
-		resourceId: 'cd47a3be-b254-42a3-918c-0878bc69ac34',
-		number: 1,
 		startDate: '2024-01-01T00:00:00',
 		endDate: '2024-06-30T00:00:00',
-		modifiedBy: null,
-		modifiedByEmail: null,
-		modifiedDate: null,
 	},
 	{
-		resourceId: 'cd47a3be-b254-42a3-918c-0878bc69ac34',
-		number: 2,
 		startDate: '2024-08-01T00:00:00',
 		endDate: '2024-08-31T00:00:00',
-		modifiedBy: null,
-		modifiedByEmail: null,
-		modifiedDate: null,
 	},
 ];
 
-const idcPeriods: any[] = [
+const idcs: Period[] = [
+	// {
+	// 	startDate: '2024-01-01T00:00:00',
+	// 	endDate: '2024-01-31T00:00:00',
+	// },
 	{
-		id: '00000000-0000-0000-0000-000000000000',
-		resourceId: null,
-		resource: null,
-		name: 'RESOURCE TEST',
-		nss: '30 741852964',
-		ccc: '159753456',
-		startDate: '2024-01-01T00:00:00',
-		endDate: '2024-01-31T00:00:00',
-		companyName: '100M MONTADITOS INTERNACIONAL, S.L.',
-	},
-	{
-		id: '00000000-0000-0000-0000-000000000000',
-		resourceId: null,
-		resource: null,
-		name: 'RESOURCE TEST',
-		nss: '30 741852964',
-		ccc: '159753456',
 		startDate: '2024-02-01T00:00:00',
 		endDate: '2024-02-29T00:00:00',
-		companyName: '100M MONTADITOS INTERNACIONAL, S.L.',
 	},
 	{
-		id: '00000000-0000-0000-0000-000000000000',
-		resourceId: null,
-		resource: null,
-		name: 'RESOURCE TEST',
-		nss: '30 741852964',
-		ccc: '159753456',
 		startDate: '2024-03-01T00:00:00',
 		endDate: '2024-03-31T00:00:00',
-		companyName: '100M MONTADITOS INTERNACIONAL, S.L.',
+	},
+	{
+		startDate: '2024-04-01T00:00:00',
+		endDate: '2024-04-30T00:00:00',
 	},
 ];
 
@@ -207,70 +173,11 @@ const checkPeriods = (contracts: any, periods: any) => {
 	};
 };
 
-const checkIdcPeriods = (periods: any, idcPeriods: any) => {
-	console.log('------- Check IDC Periods --------');
-
-	if (periods.length === 0 && idcPeriods.length === 0) {
-		return {
-			show: false,
-			message: null,
-		};
-	}
-
-	idcPeriods
-		.map((idcPeriod: any) => {
-			return {
-				...idcPeriod,
-				startDate: new Date(idcPeriod.startDate),
-				endDate: new Date(idcPeriod.endDate),
-			};
-		})
-		.sort((a: any, b: any) => a.startDate - b.startDate);
-
-	periods
-		.map((period: any) => {
-			return {
-				...period,
-				startDate: new Date(period.startDate),
-				endDate: new Date(period.endDate),
-			};
-		})
-		.sort((a: any, b: any) => a.startDate - b.startDate);
-
-	const interception = (p1: any, p2: any) => {
-		return p1.startDate <= p2.endDate && p2.startDate <= p1.endDate;
-	};
-
-  const dateBetween = (start: any, end: any) => {
-    const dates: Date[] = [];
-    for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
-      console.log('Date', date);
-      dates.push(new Date(date));
-    }
-    return dates;
-  }
-
-  const periodsDays = periods.flatMap((p: any) => dateBetween(p.startDate, p.endDate));
-  const idcPeriodsDays = idcPeriods.flatMap((p: any) => dateBetween(p.startDate, p.endDate));
-
-  const result = [...new Set([...periodsDays, ...idcPeriodsDays])].filter((day: any) => !periodsDays.includes(day) || !idcPeriodsDays.includes(day));
-
-  console.log('Periods Days', periodsDays);
-  console.log('IDC Periods Days', idcPeriodsDays);
-  console.log('Result', result);
-
-	return {
-		show: false,
-		message: null,
-	};
-};
-
 const periodResult = checkPeriods(contracts, periods);
-const idcPeriodResult = checkIdcPeriods(periods, idcPeriods);
 
 const notices = {
 	periods: periodResult,
-	idcPeriods: idcPeriodResult,
+	idcPeriods: { show: false, message: null },
 };
 
 const falsy = Object.values(notices).every(
@@ -289,3 +196,126 @@ console.log({
 	falsy,
 	react,
 });
+
+
+function getDaysFromPeriods(periods: Period[]): string[] {
+  const allDays: string[] = [];
+
+  periods.forEach(period => {
+    const startDate = new Date(period.startDate);
+    const endDate = new Date(period.endDate);
+
+    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+      allDays.push(date.toISOString().split('T')[0]);
+    }
+  });
+
+  return allDays;
+}
+
+function findUniqueDays(array1: string[], array2: string[]): string[] {
+  // Convertir los arreglos a conjuntos para una búsqueda más eficiente
+  const set1 = new Set(array1);
+  const set2 = new Set(array2);
+
+  // Utilizar filter para encontrar los elementos únicos
+  const uniqueDays = [...array1, ...array2].filter(day => {
+    return !set1.has(day) || !set2.has(day);
+  });
+
+  return uniqueDays;
+}
+
+function filterDaysBeforeDate(days: string[]): string[] {
+  // const limitDateObj = new Date(limitDate);
+	const limitDateObj = new Date(
+		new Date().getFullYear(),
+		new Date().getMonth(),
+		0,
+	)
+
+  return days.filter(day => {
+    const dayObj = new Date(day);
+    return dayObj <= limitDateObj;
+  });
+}
+
+function groupDaysIntoPeriods(days: string[]): { startDate: string; endDate: string }[] {
+  if (!days.length) return [];
+
+  days.sort(); // Asegurarse de que los días estén ordenados
+
+  const periods: { startDate: string; endDate: string }[] = [];
+  let currentPeriod = { startDate: days[0], endDate: days[0] };
+
+  for (let i = 1; i < days.length; i++) {
+    const prevDay = new Date(days[i - 1]);
+    const currentDay = new Date(days[i]);
+
+	const diffInDays = Math.ceil((currentDay.getTime() - prevDay.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 1) {
+      // Si los días son consecutivos, actualizamos el endDate del período actual
+      currentPeriod.endDate = days[i];
+    } else {
+      // Si no son consecutivos, agregamos el período actual a la lista y comenzamos uno nuevo
+      periods.push(currentPeriod);
+      currentPeriod = { startDate: days[i], endDate: days[i] };
+    }
+  }
+
+  // Agregar el último período a la lista
+  periods.push(currentPeriod);
+
+  return periods;
+}
+function findDiscrepancies(periods: Period[]): string {
+  const discrepancies: string[] = [];
+
+  periods.forEach(period => {
+    if (period.startDate !== period.endDate) {
+      discrepancies.push(`${period.startDate}/${period.endDate}`);
+    }
+		if (period.startDate === period.endDate) {
+			discrepancies.push(`${period.startDate}`);
+		}
+  });
+
+  if (discrepancies.length > 0) {
+    return `Se encontraron discrepancias en ${discrepancies.join(', ')}`;
+  } else {
+    return 'No se encontraron discrepancias.';
+  }
+}
+
+
+
+const rntDays = getDaysFromPeriods([{
+	startDate: '2024-01-01T00:00:00',
+	endDate: '2024-01-03T00:00:00',
+},
+{
+	startDate: '2024-08-01T00:00:00',
+	endDate: '2024-08-03T00:00:00',
+}]);
+const idcDays = getDaysFromPeriods([
+	{
+		startDate: '2024-01-01T00:00:00',
+		endDate: '2024-01-05T00:00:00',
+	},
+	{
+		startDate: '2024-07-31T00:00:00',
+		endDate: '2024-08-05T00:00:00',
+	},
+])
+// const rntDays = getDaysFromPeriods(rnts);
+// const idcDays = getDaysFromPeriods(idcs);
+const uniqueDays = findUniqueDays(rntDays, idcDays);
+const filteredDays = filterDaysBeforeDate(uniqueDays);
+const uniquePeriods = groupDaysIntoPeriods(uniqueDays);
+const message = findDiscrepancies(uniquePeriods);
+
+const checkedIdcPeriods = discrepancies(idcs, periods);
+const checkedPeriods = discrepancies(contracts, periods);
+console.log('Periods vs IDC Periods: ', checkedIdcPeriods);
+console.log('Periods vs Contracts: ', checkedPeriods);
